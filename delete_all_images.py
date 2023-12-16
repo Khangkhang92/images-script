@@ -12,16 +12,16 @@ auth = (username, password)
 api_url = value = os.environ.get('APIURL')
 
 
-def get_all_images(api_url, headers):
+def get_all_images(api_url, headers, limit=10000):
     try:
-        response = requests.get(api_url, headers=headers, auth=auth)
+        params = {'limit': limit}
+        response = requests.get(api_url, headers=headers, params=params, auth=auth)
 
         if response.status_code == 200:
             data = response.json()
             logger.info(f"Successfully retrieved data: {data}")
         else:
-            logger.error(
-                f"Failed to retrieve data. Status code: {response.status_code}")
+            logger.error(f"Failed to retrieve data. Status code: {response.status_code}")
         return data['result']
 
     except Exception as e:
@@ -33,14 +33,12 @@ def delete_images_by_ids(api_url, headers, image_ids):
         delete_url = f'{api_url}'
         payload = {"ids": image_ids}
 
-        response = requests.delete(
-            delete_url, headers=headers, json=payload, auth=auth)
+        response = requests.delete(delete_url, headers=headers, json=payload, auth=auth)
 
         if response.status_code == 200:
             logger.info(f"Successfully deleted images with IDs: {image_ids}")
         else:
-            logger.error(
-                f"Failed to delete images. Status code: {response.status_code}")
+            logger.error(f"Failed to delete images. Status code: {response.status_code}")
             logger.error(response.text)
 
     except Exception as e:
@@ -51,7 +49,7 @@ if __name__ == "__main__":
     headers = {
         'Content-Type': 'application/json',
     }
-    all_items = get_all_images(api_url, headers)
+    all_items = get_all_images(api_url, headers, limit=10000)
     for item in all_items:
         image_ids_to_delete.append(int(item['id']))
     delete_images_by_ids(api_url, headers, image_ids_to_delete)

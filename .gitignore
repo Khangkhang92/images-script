@@ -1,3 +1,6 @@
 Anh/
 .env
 *.xlsx
+env/
+BK/
+*.csv
